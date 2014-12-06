@@ -54,12 +54,11 @@ public class RelationData {
 			list = dbOperator.query("select * from rfid_paras", null); 
 			for( DBInstance db: list)
 			{
-				paras.put(db.getValue("key"), db.getValue("value")) ;
+				paras.put(db.getValue("paras_key"), db.getValue("paras_value")) ;
 			}
 			this.isFulled = true ;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 			log.error("数据初始化失败" + e);
 		}
 	}

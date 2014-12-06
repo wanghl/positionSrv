@@ -13,6 +13,7 @@ import org.apache.mina.core.session.IoSession;
 
 import com.position.db.DBInstance;
 import com.position.db.DBManager;
+import com.position.db.DBOperator;
 import com.position.message.IReaderMessage;
 import com.position.message.MessageBodyFactory;
 import com.position.message.MessageResponse;
@@ -90,6 +91,7 @@ public class PositionHandler extends IoHandlerAdapter {
 		//log.info(status);
 	}
 	
+
 
 
 }

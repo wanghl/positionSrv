@@ -69,9 +69,6 @@ public class PositionMessageSender extends HttpServlet {
 					break;
 				} catch (RuntimeIoException e) {
 					// System.err.println(&quot;Failed to connect.&quot;);
-					 e.printStackTrace();
-					 
-					 log.error(e);
 					log.error("连接服务器失败! 5秒后重连");
 					try {
 						Thread.sleep(5000);

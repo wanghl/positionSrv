@@ -10,6 +10,8 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 
+import com.position.db.DBManager;
+
 public class PositionLoggingFilter extends IoFilterAdapter {
 	
 	private static final Logger log = Logger.getLogger(PositionLoggingFilter.class) ;
@@ -24,6 +26,8 @@ public class PositionLoggingFilter extends IoFilterAdapter {
 		
 		log.info("连接服务器成功");
 		
+		DBManager.newInstance().sotreTcpConnectionChanges(session, 1);
+		
 		nextFilter.sessionOpened(session);
 	}
 
@@ -36,6 +40,14 @@ public class PositionLoggingFilter extends IoFilterAdapter {
 	public void sessionIdle(IoFilter.NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
 		nextFilter.sessionIdle(session, status);
 	}
+	
+	public void sessionClosed(IoFilter.NextFilter nextFilter, IoSession session) throws Exception {
+		DBManager.newInstance().sotreTcpConnectionChanges(session, 1);
+
+		nextFilter.sessionClosed(session);
+	}
+
+
 
 	
 
