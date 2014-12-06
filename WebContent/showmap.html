@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" name="viewport"
+	content="width=device-width, initial-scale=1 ,user-scalable=no">
+</style>
+<title>井盖监控系统</title>
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.css" />
+	
+<link rel="stylesheet" type="text/css" href="css/dark-glass/sidebar.css" />
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/jquery-ui.min.js"></script>
+<script src="js/jquery.sidebar.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/jinggai.js"></script>
+<script src="js/showmap.js"></script>
+<script type="text/javascript"
+	src="http://api.map.baidu.com/api?v=1.5&ak=mtWq13rGeSvEKt1keYj2bvIu"></script>
+<script src="js/changeMore.js"></script>
+<script src="js/convertor.js"></script>
+<script src="js/richMarker.js"></script>
+<script src="js/MapWrapper.js"></script>
+</head>
+<script type="text/javascript"
+	src="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.js"></script>
+
+
+
+<body style="background-color: #eee;">
+	<div class="container-fluid">
+
+		<div class="row">
+
+			<ul id="menu">
+				<li><a href="index.html">主页</a></li>
+				<li><a href="showmap.html">位置地图</a></li>
+				<li><a href="mcmalarm.html">告警记录</a></li>
+				<li><a href="mcmdata.html">井盖信息</a></li>
+				<li><a href="readerdebug.html">基站调试</a></li>
+				<li><a href="#">系统设定</a></li>
+				<li><a href="tools.html">工具</a></li>
+			</ul>
+			<div class="col-md-12">
+
+				<div class="panel panel-default">
+					<!-- div class="panel-heading"><img alt="信号正常" width='20' height='20' src="images/jg_s.png"><label style="font-size:90%">&nbsp;信号正常</label><img width='20' height='20' alt="井盖告警" src="images/jg_e.png"><label style="font-size:90%">&nbsp;井盖告警</label><img width='20' height='20' alt="初始状态" src="images/jg_u.png"><label style="font-size:90%">&nbsp;初始状态</label><img width='20' height='20' alt="无信号 " src="images/jg_l.png"><label style="font-size:90%">&nbsp;无信号</label></div>
+					 -->
+					<div class="embed-responsive embed-responsive-16by9">
+						<div class="embed-responsive-item" id="mapcontainer"></div>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+	<embed id="alarm_sound" src="sound/901135.wav" width="0" height="0"
+		loop="false" autostart="false">
+	</embed>
+
+</body>
+<script type="text/javascript">
+	$("ul#menu").sidebar();
+	var JG_ICNO_S = new BMap.Icon("images/jg_s.png", new BMap.Size(32,32));  //正常情况井盖图标
+	var JG_ICNO_E = new BMap.Icon("images/jg_e.png", new BMap.Size(32,32));  //非法打开井盖图标
+	var JG_ICNO_U = new BMap.Icon("images/jg_u.png", new BMap.Size(32,32));  //初始井盖图标
+	var JG_ICNO_L = new BMap.Icon("images/jg_l.png", new BMap.Size(32,32));  //井盖卡未检测到图标 
+	
+	//播放告警声音
+	
+	function playAlarmSound()
+	{
+		var node=document.getElementById("alarm_sound"); 
+		
+		 if(node!=null)  
+		 {  
+		  node.Play();  
+		 }   
+	}
+	
+	// 包头市中心的经纬度 ，获取GPS失败的情况下使用下面的经纬度展示地图
+	var curLat = 40.65;
+	var curLon = 109.83;
+
+	// 获取当前GPS信息
+	var gpsinfo = callServlet("/mcm/gpsinfo", {callType : "getGpsInfo"});
+	
+	if (typeof(gpsinfo) != "undefined" && gpsinfo.status.indexOf('正常') >= 0) {
+		curLat = gpsinfo.latitude;
+		curLon = gpsinfo.longitude;
+	}
+	//  地图初始化   
+	var map = new BMap.Map("mapcontainer");
+	var point = new BMap.Point(curLon, curLat);
+	map.centerAndZoom(point, 15);
+	//map.addControl(new BMap.MapTypeControl()); //添加地图类型控件
+	map.enableScrollWheelZoom(true); //开启缩放
+	map.disableDoubleClickZoom() ;
+	var top_left_navigation = new BMap.NavigationControl(); //左上角，添加默认缩放平移控件
+	map.addControl(top_left_navigation);
+	var gc = new BMap.Geocoder();    
+	var currentMarker ;
+	//弹出信息框样式  
+	var searchInfoWindow = new BMapLib.SearchInfoWindow(map, "", {
+		title: "",
+		panel : "panel",
+		width:115,
+		enableAutoPan : true,
+	    searchTypes :[
+		] 
+	});
+	
+	map.addEventListener('click', function(){
+		searchInfoWindow.close() ;
+	});
+	
+	//可以转化gps坐标
+    var mapWforGPS = new BMapLib.MapWrapper(map, BMapLib.COORD_TYPE_GPS); 
+	
+	
+	function overlayCurrent(curpoint){
+		if ( arguments [0] == undefined)
+		{
+			var curpoint = new BMap.Point(/*GPS坐标*/curLon, curLat) ;
+		}
+		
+		currentMarker = new BMap.Marker(curpoint );
+		currentMarker.setTitle("您的当前位置") ;
+		mapWforGPS.addOverlay(currentMarker);
+		//alert( typeof(map.getCenter()) == "object" ) ;
+		//map.panTo(curpoint) ;
+	/* 	var pt = map.getBounds().getCenter();
+		var va=new Array(pt) ;
+		map.setViewport(va,{zoomFactor:-4}) ; */
+		//map.setCenter(curpoint);
+		//currentMarker.setAnimation(BMAP_ANIMATION_BOUNCE);
+		currentMarker.addEventListener('click' ,function(e){
+			
+			var pt = e.point;
+			gc.getLocation(pt, function(rs){
+				var addComp= rs.addressComponents;
+				var titles = "<div style='margin:0;line-height:20px;padding:2px;'>您在" + addComp.city  + addComp.district + addComp.street + addComp.streetNumber + " 附近。</br></div>";
+			//	searchInfoWindow.setTitle('s') ;
+				searchInfoWindow.open(pt);
+				searchInfoWindow.addEventListener("open", function(e) {
+					searchInfoWindow.setTitle('您的当前位置 ') ;
+					searchInfoWindow.setContent(titles) ;
+				});
+			});   
+			
+		});
+		
+	}
+
+
+	//GPS信号正常的情况下 ，地图展示完成2秒后在地图上定位当前位置信息 。
+   	window.setTimeout("overlayCurrent()", 2000);   
+	<!--  将井盖信息添加到地图上   -->
+	var rfids =  callServlet("/mcm/dbservice","action=marker") ;
+	
+	var points = [];
+	var _index =  0 ;
+ 	for (var i = 0 ; i < rfids.length ; i++)
+	{
+ 		
+ 		if(rfids[i].objmap.viewable == 0)
+ 			continue ;   //不可见的标注
+ 		var rfidcard = rfids[i].objmap ;
+ 		var point = new BMap.Point(/*GPS坐标*/rfidcard.longitude, rfidcard.latitude) ;
+ 		var gpsMkr = new BMap.Marker( point,{icon:JG_ICNO_U});
+ 		gpsMkr.setTitle("RFID卡号:" + rfidcard.rfidcard_id) ;
+ 		
+ 	   // map.setCenter(point); 
+ 		mapWforGPS.addOverlay(gpsMkr);
+ 	//	gpsMkr.addEventListener("click",openInfo.bind(null,rfidcard.content,"RFID卡号:" + rfidcard.rfidcard_id));
+ 		gpsMkr.addEventListener("click",openInfo.bind(null,rfidcard.content,"RFID卡号:" + rfidcard.rfidcard_id));
+ 	
+
+	}
+ 	
+	function openInfo(content,title,e){
+		searchInfoWindow.close();
+		var p = e.target;
+		var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+		gc.getLocation(point, function(rs){
+		var addComp= rs.addressComponents;
+	
+		var titles = "<div style='margin:0;line-height:20px;padding:2px;'>大概位于" + addComp.city  + addComp.district + addComp.street + addComp.streetNumber + " 附近。</br></div>";
+		//	searchInfoWindow.setTitle('s') ;
+		searchInfoWindow.open(p);
+			searchInfoWindow.addEventListener("open", function(e) {
+				searchInfoWindow.setTitle(title) ;
+				searchInfoWindow.setContent(content + titles) ;
+			});
+		
+		});   
+		
+	
+		
+	}
+
+	
+	// 每3秒更新井盖状态信息 ;
+	//
+	function overWriteAlarmPoint()
+	{
+
+		var allOverlay = map.getOverlays();
+		var rfids =  callServlet("/mcm/dbservice","action=getMCStatus") ;
+		if ( rfids == "")
+			return ;
+		for( var i = 0 ; i < rfids.length ; i++)
+		{
+		
+			var cardid = rfids[i].objmap.rfidcard_id ;
+			var mc_status =  rfids[i].objmap.mc_status ;
+			for ( var j = 0 ; j < allOverlay.length - 1; j ++)
+			{
+				var title =  allOverlay[j].getTitle() ;
+				
+				if ( title == null )
+					continue ;
+				title = title.toString().split(":")[1];
+				
+				//信号正常
+				if ( title == cardid && mc_status == "1" && allOverlay[j].getIcon().imageUrl != "images/jg_s.png"  )
+				{
+					allOverlay[j].setIcon(JG_ICNO_S) ;
+				}
+				//井盖未检测到
+				if ( title == cardid  && mc_status == "2" && allOverlay[j].getIcon().imageUrl != "images/jg_l.png"  )
+				{
+					
+					allOverlay[j].setIcon(JG_ICNO_L) ;
+					playAlarmSound() ;
+				}
+				//井盖初始化状态
+				if ( title == cardid  && mc_status == "-1" && allOverlay[j].getIcon().imageUrl != "images/jg_u.png"  )
+				{
+				
+					allOverlay[j].setIcon(JG_ICNO_U) ;
+					
+				}
+				//井盖告警
+				if ( title == cardid  && mc_status == "0" && allOverlay[j].getIcon().imageUrl != "images/jg_e.png"  )
+				{
+					allOverlay[j].setIcon(JG_ICNO_E) ;
+					playAlarmSound() ;
+					//var label = new BMap.Label("<a onclick='pop(" + cardid + ")' href='#'>确认告警</a>",{offset:new BMap.Size(20,-10)});
+					//allOverlay[j].setLabel(label) ;
+				}
+			}
+			
+		} 
+
+	}
+
+		setInterval("overWriteAlarmPoint()",3000) ;
+
+	///  每5秒在地图上更新当前位置 ； 
+	
+	function overWritePoint()
+	{
+		var curLat ,curLon ;
+		var gpsinfo = callServlet("/mcm/gpsinfo", {callType : "getGpsInfo"});
+		if (typeof(gpsinfo) != "undefined" && gpsinfo.status.indexOf('正常') >= 0) {
+			curLat = gpsinfo.latitude;
+			curLon = gpsinfo.longitude;
+		}
+		else 
+		{
+			return ;
+		}
+		var allOverlay = map.getOverlays();
+		for ( var j =0  ; j < allOverlay.length ; j ++)
+		{
+			var title =  allOverlay[j].getTitle() ;
+			if ( typeof(title) != "undefined" && title == "您的当前位置")
+			{
+				map.removeOverlay(  allOverlay[j] );
+				
+			} 
+		}
+		//map.removeOverlay( currentMarker );
+		var curpoint = new BMap.Point(curLon, curLat);
+		overlayCurrent(curpoint) ;
+		
+	}
+	
+	setInterval("overWritePoint()",5000) ;
+	
+	/// 重置井盖状态
+	
+	function reSetStatus()
+	{
+		if(confirm("确定重置井盖状态? ") )
+		{
+			var rv =  callServlet("/mcm/dbservice","action=reset") ;
+			if(rv.error_code == "succress")
+			{
+				alert('重置成功') ;	
+			}
+			
+		}
+	}
+
+	
+	// 定义一个控件类,即function
+	function ZoomControl(){
+	  // 默认停靠位置和偏移量
+	  this.defaultAnchor = BMAP_ANCHOR_TOP_RIGHT;
+	  this.defaultOffset = new BMap.Size(10, 10);
+	}
+
+	
+	// 通过JavaScript的prototype属性继承于BMap.Control
+	ZoomControl.prototype = new BMap.Control();
+
+	// 自定义控件必须实现自己的initialize方法,并且将控件的DOM元素返回
+	// 在本方法中创建个div元素作为控件的容器,并将其添加到地图容器中
+	ZoomControl.prototype.initialize = function(map){
+	  // 创建一个DOM元素
+	  var div = document.createElement("div");
+	  // 添加文字说明
+	 //<img alt="信号正常" width='20' height='20' src="images/jg_s.png"><label style="font-size:90%">&nbsp;信号正常</label><img width='20' height='20' alt="井盖告警" src="images/jg_e.png"><label style="font-size:90%">&nbsp;井盖告警</label><img width='20' height='20' alt="初始状态" src="images/jg_u.png"><label style="font-size:90%">&nbsp;初始状态</label><img width='20' height='20' alt="无信号 " src="images/jg_l.png"><label style="font-size:90%">&nbsp;无信号</label>
+	 var img1 =  document.createElement("img");
+	 img1.setAttribute('width','20') ;
+	 img1.setAttribute('height','20') ;
+	 img1.setAttribute('src','images/jg_s.png') ;
+	 
+	 var label1 =  document.createElement("label");
+	 label1.setAttribute('style','font-size:90%') ;
+	 label1.innerHTML = "正常" ;
+	 div.appendChild(img1);
+	 div.appendChild(label1);
+	 //
+	 var img2 =  document.createElement("img");
+	 img2.setAttribute('width','20') ;
+	 img2.setAttribute('height','20') ;
+	 img2.setAttribute('src','images/jg_e.png') ;
+	 
+	 var label2 =  document.createElement("label");
+	 label2.setAttribute('style','font-size:90%') ;
+	 label2.innerHTML = "告警" ;
+	 div.appendChild(img2);
+	 div.appendChild(label2);
+	 //
+	 var img3 =  document.createElement("img");
+	 img3.setAttribute('width','20') ;
+	 img3.setAttribute('height','20') ;
+	 img3.setAttribute('src','images/jg_u.png') ;
+	 
+	 var label3 =  document.createElement("label");
+	 label3.setAttribute('style','font-size:90%') ;
+	 label3.innerHTML = "初始状态" ;
+	 div.appendChild(img3);
+	 div.appendChild(label3);
+	 //
+	 var img4 =  document.createElement("img");
+	 img4.setAttribute('width','20') ;
+	 img4.setAttribute('height','20') ;
+	 img4.setAttribute('src','images/jg_l.png') ;
+	 
+	 var label4 =  document.createElement("label");
+	 label4.setAttribute('style','font-size:90%') ;
+	 label4.innerHTML = "无信号" ;
+	 
+	 var button = document.createElement('input') ;
+	 button.setAttribute('value' ,'重置') ;
+	 button.setAttribute('type' ,'button') ;
+	 button.setAttribute('onclick','reSetStatus()') ;
+	 div.appendChild(img4);
+	 div.appendChild(label4);
+	 
+	 div.appendChild(button) ;
+	  // 设置样式
+	  div.style.cursor = "pointer";
+	 // div.style.border = "1px solid gray";
+	 // div.style.backgroundColor = "white";
+	
+	  // 添加DOM元素到地图中
+	  map.getContainer().appendChild(div);
+	  // 将DOM元素返回
+	  return div;
+	}
+	
+	// 创建控件
+	var myZoomCtrl = new ZoomControl();
+	// 添加到地图当中
+	map.addControl(myZoomCtrl);
+
+ 
+	// 井盖标注样式 ：
+	
+
+</script>
+</html>

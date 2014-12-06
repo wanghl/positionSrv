@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="gb2312" name="viewport"
+	content="width=device-width, initial-scale=1">
+<title>人员定位</title>
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/position.js"></script>
+</head>
+<body style="background-color: #eee;">
+	<nav class="navbar navbar-inverse" role="navigation">
+		<a class="navbar-brand" href="#">人员定位系统</a> <label
+			style="float: right; padding-top: 15px; padding-right: 5px;"><font
+			color='gray'>hi~ 管理员！| 退出</font></label>
+	</nav>
+	<div class="container-fluid">
+
+		<div class="row">
+
+			<div class="col-md-2">
+				<div class="list-group">
+					<a class="list-group-item active" href="index.html">位置信息</a> <a
+						class="list-group-item " href="#">标签维护</a> <a
+						class="list-group-item " href="#">区域维护</a> <a
+						class="list-group-item" href="#">标签移动轨迹</a> <a
+						class="list-group-item " href="#">网络连接日志</a> <a
+						class="list-group-item" href="#">阅读器信息</a> <a
+						class="list-group-item" href="#">系统设置</a>
+				</div>
+			</div>
+			<div class="col-md-10">
+
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<span class="label label-danger">位置信息</span>
+					</div>
+					<div class="panel-body">
+						<table class="table table-hover" id="positionInfor">
+							<thead>
+								<tr>
+									<th>序号</th>
+									<th>标签编号</th>
+									<th>自定义卡号</th>
+									<th>x坐标</th>
+									<th>y坐标</th>
+									<th>z坐标</th>
+									<th>更新时间</th>
+
+								</tr>
+							</thead>
+							<tbody>
+								<tr></tr>
+							</tbody>
+						</table>
+
+					</div>
+				</div>
+
+
+			</div>
+
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	function getTagsInfor() {
+
+		var v = callServlet("/positionsrv/taginfor", null, 'html');
+		$('#positionInfor tbody tr').remove();
+		if (typeof (v.error_code) == "undefined") {
+			$('#positionInfor tbody').append(v);
+		} else {
+			$('#positionInfor tbody tr').remove();
+		}
+	}
+	getTagsInfor();
+	$(function() {
+		setInterval("getTagsInfor()", 500);
+	});
+</script>
+</html>

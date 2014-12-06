@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="gb2312" name="viewport"
+	content="width=device-width, initial-scale=1">
+<title>井盖监控系统</title>
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/bootstrap-paginator.min.js"></script>
+<script src="js/jinggai.js"></script>
+</head>
+<body style="background-color: #eee;">
+	<nav class="navbar navbar-inverse" role="navigation">
+		<a class="navbar-brand" href="#">井盖监控系统</a>
+	</nav>
+	<div class="container-fluid">
+
+		<div class="row">
+
+<!-- 			<div class="col-md-2">
+				<ul class="nav nav-pills nav-stacked" role="tablist">
+					<li role="presentation"><a href="index.html">主页</a></li>
+					<li class="active" role="presentation"><a href="mcmdata.html">井盖信息维护</a></li>
+					<li role="presentation"><a href="readerdebug.html">阅读器信号调试</a></li>
+					<li role="presentation"><a href="#">系统设定</a></li>
+					<li role="presentation"><a href="tools.html">工具</a></li>
+				</ul>
+
+
+			</div> -->
+			<div class="col-md-2">
+				<div class="list-group">
+					    <a class="list-group-item" href="index.html">主页</a>
+					    <a class="list-group-item " href="showmap.html">位置地图</a>
+					    <a class="list-group-item" href="mcmalarm.html">告警记录</a>
+					    <a class="list-group-item active" href="mcmdata.html">井盖信息维护</a>
+						<a class="list-group-item" href="readerdebug.html">阅读器信号调试</a>
+						<a class="list-group-item" href="#">系统设定</a>
+						<a class="list-group-item" href="tools.html">工具</a>
+			   </div>
+			</div>
+			<div class="col-md-10">
+
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-md-4">
+								<button type="button" class="btn btn-primary btn-sm" id="createNew">新增</button>
+								<button type="button" class="btn btn-warning btn-sm" id="modify">修改</button>
+								<button type="button" class="btn btn-danger btn-sm" id="deleteMC">删除</button>
+								<label id="rfidcount" ></label>
+							</div>
+							<div class="col-md-8">
+							  <div class="col-xs-3">
+							    <input type="text" class="form-control" id="cardid" placeholder="卡号">
+							  </div>
+							
+							  <div class="col-xs-3">
+							    <input type="text" class="form-control" id="mcnumber" placeholder="井盖编号">
+							  </div>
+							</div>
+						</div>
+						</div>
+					<div class="panel-body">
+						<table id="mc_list_table" class="table table-hover ">
+							<thead>
+								<tr>
+									<th> <label class="checkbox-inline"><input type="checkbox" id="checkbox_selectall" ><strong>序号</strong></label></th>
+									<th>卡号</th>
+									<th>井盖编号</th>
+									<th>纬度</th>
+									<th>经度</th>
+									<th>产权单位</th>
+									<th>联系人</th>
+									<th>联系电话</th>
+									<th>备注</th>
+								</tr>
+							</thead>
+							<tbody></tbody>
+
+						</table>
+						<ul id="mcminfo" ></ul>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+	<!-- 新增数据 Modal -->
+	<div class="modal fade" id="editModel" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+				
+			<form id="dataform" class="form-horizontal" role="form" action="/mcm/dbservice" method="post">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+						</button>
+						<ul class="list-inline">
+							<li><h4 class="modal-title" id="myModalLabel">新增/修改数据</h4></li>
+							<li style="padding-left: 130px;"><span id="addnew_label" savecount="" class="label label-success"></span></li>
+						</ul>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="rfidcard_id" class="col-sm-2 control-label">卡号</label>
+							<div class="col-sm-4">
+								<input type="text" class="form-control" name="rfidcard_id" id="rfidcard_id">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="mc_number" class="col-sm-2 control-label">井盖编号</label>
+							<div class="col-sm-4">
+								<input type="text" class="form-control" name="mc_number" id ="mc_number">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="latitude_number" class="col-sm-2 control-label">纬度</label>
+							<div class="col-sm-4">
+								<input type="text" class="form-control" name="latitude" id="latitude_number">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="longitude_number" class="col-sm-2 control-label">纬度</label>
+							<div class="col-sm-4">
+								<input type="text" class="form-control" name="longitude"  id="longitude_number">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="linkman" class="col-sm-2 control-label">联系人</label>
+							<div class="col-sm-4">
+								<input type="text" class="form-control" name="linkman">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="contact_number" class="col-sm-2 control-label">联系电话</label>
+							<div class="col-sm-4">
+								<input type="text" class="form-control" name="contact_number">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="mc_owner" class="col-sm-2 control-label">产权单位</label>
+							<div class="col-sm-8">
+								<input type="text" class="form-control" name="mc_owner">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="contact_number" class="col-sm-2 control-label">备注</label>
+							<div class="col-sm-8">
+								<textarea class="form-control" rows="3" name="note"></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal" id="closebutton">关闭</button>
+						<button type="button" class="btn btn-primary" id="submitdata">保存</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+</body>
+<script type="text/javascript">
+	$(function() {
+		
+		$('.col-md-8 input').bind('keypress',function(event){
+            if(event.keyCode == "13")    
+            {
+                var cardid = $("#cardid").val();
+                var mcnumber = $("#mcnumber").val();
+                if ( mc_number == "" && rfidcard_id == "" )
+                {
+                	alert("请输入查询条件");
+                	return ;
+                }
+                var p = {action : "queryLimit" , limitstart: 0 ,limitend: 10} ; 
+                if( cardid !="" )
+                	p["rfidcard_id"] = cardid ;
+                if( mc_number )
+                	p["mc_number"] = mcnumber ;
+                loadData(null,null,null,null, p) ;
+                
+            }
+        });
+		
+		// 加载数据 
+		//var modelCosed = false ;
+		loadData() ;
+		
+		function loadData(e,originalEvent,type,page ,paras)
+		{
+			var start = 0 ;
+			if ( typeof(page) != "undefined" && page != null  )
+			{
+				start = (page -1 )  * 10  ;
+			}
+			var p = {action : "queryLimit" ,limitstart: start ,limitend: 10} ; 
+			if ( typeof(paras) != "undefined")
+			{
+				p =  paras
+			}
+			var v = callServlet("/mcm/dbservice",p, "html") ;
+			$('#mc_list_table tbody tr').remove();
+			$('#mc_list_table tbody').append(v.split("&")[0]);
+			
+			 var total = parseInt(v.split("&")[1]);
+			 $("#rfidcount").text("｛共 " + total + " 条数据｝") ;
+			 if ( total % 10 == 0)
+			{
+				total = total /10 ;	 
+			}
+			 else 
+			 {
+				 total = total /10    +  1;	
+			}
+			var number = 0 ;
+			if ( total < 10 )
+			{
+				number = total ;
+			}
+			else
+			{
+				number = 5 ;
+			}
+		 options = {totalPages: total ,bootstrapMajorVersion:3,numberOfPages: number ,size:"mini",alignment:"center",size:"small",onPageClicked: loadData} ;
+			$('#mcminfo').bootstrapPaginator(options);
+			
+		}
+		function loadGpsInfo()
+		{
+			 var gpsinfo  = callServlet("/mcm/gpsinfo",{callType:"getGpsInfo"}) ;
+			    if ( gpsinfo.status.indexOf('正常') >= 0)
+			    {
+				    $('#latitude_number').val(gpsinfo.latitude) ;
+				    $('#longitude_number').val(gpsinfo.longitude) ;
+			    	
+			    }
+		}
+		$('#submitdata').on('click', function(e){
+			if ( $("#rfidcard_id").val()=="" || $("#mc_number").val()=="" )
+			{
+				alert("卡号和井盖编号不能为空") ;
+				return ;
+			}
+			
+			if ( $("#latitude_number").val()=="" || $("#longitude_number").val()=="" )
+			{
+				alert("经纬度值不能为空") ;
+				return ;
+			}
+			
+			var action = "" ;
+			if ( $('#createNew').hasClass('selected'))
+			{
+				action = "addNew" ;
+			}
+			else
+			{
+				var objuid = $('#mc_list_table tbody input[type="checkbox"]:checked').attr('value');
+				action = "modify&objuid=" + objuid ;
+			}
+			
+			var rv = callServlet("/mcm/dbservice",$('#dataform').serialize() + "&action=" + action) ;
+			if ( rv.error_code == 'success' )
+			{
+				// 新增后的处理 
+				if ( action == 'addNew')
+				{						
+					var savecount = $('#addnew_label').attr('savecount') ;
+					if ( savecount == null || savecount == "")
+					{
+						savecount = 1 ;
+					}
+					else
+					{
+						savecount = parseInt( $('#addnew_label').attr('savecount')  ) ;
+						savecount += 1; 
+					}
+					
+					 $('#addnew_label').text('新增数据成功 + ' + savecount) ;
+					 $('#addnew_label').attr('savecount' ,savecount) ;
+					 $('#rfidcard_id').val("") ;
+					 loadGpsInfo();
+					 // 加载数据 
+					
+					 loadData();
+					 $("#mcminfo").bootstrapPaginator("showFirst")
+				}
+				// 数据修改
+				else
+				{
+					loadData();
+					 $("#mcminfo").bootstrapPaginator("showFirst")
+					$('#editModel').modal('hide');
+				}
+			}
+			else
+			{
+				alert(rv.error_message) ;
+			}
+		}) ;
+		/* 新增按钮 */
+		$('#createNew').on('click', function(event) {
+			$('#editModel').modal('show');
+			$('#addnew_label').text('') ;
+			 $('#addnew_label').attr('savecount' ,"") ;
+			$(this).addClass('selected') ;
+			$('#modify').removeClass('selected');
+		});
+		
+		/* 修改按钮 */
+		$('#modify').on('click', function(event) {
+			var objuid = $('#mc_list_table tbody input[type="checkbox"]:checked').attr('value');
+			if ( typeof(objuid) == 'undefined')
+			{
+				alert('请选择要修改的数据') ;
+				return ;
+			}
+		//	$('#editModel').modal({remote: "/mcm/dbservice?action=query&objuid=" + objuid + "&dataType=json"});
+			var v = callServlet("/mcm/dbservice", "action=query&dataType=json&objuid=" + objuid) ;
+			$('#editModel').modal('show');
+			
+			pase2Element(v.objmap) ;
+			
+			$(this).addClass('selected') ;
+			$('#createNew').removeClass('selected');
+		});
+		
+		/* 删除按钮  */
+		
+		$('#deleteMC').on('click',function(e){
+			if ( $('#mc_list_table tbody input[type="checkbox"]:checked').size() == 0 )
+			{
+				alert("请勾选要删除的数据"); 
+				return;
+			}
+			
+			var mclist = "";
+			$('#mc_list_table tbody input[type="checkbox"]:checked').each(function(e){
+				
+				mclist += $(this).val() + ",";
+				
+			});
+			var rv = callServlet("/mcm/dbservice","idlist=" + mclist + "&action=deleteMC") ;
+			
+			if ( rv.error_code == 'success' )
+			{
+				loadData() ;
+			}
+			
+		}); 
+		
+		$('#checkbox_selectall').on('change', function(e){
+			
+			var baseselect = $('#checkbox_selectall').is(":checked")  ;
+			if ( baseselect )
+			{
+				$('#mc_list_table tbody input[type="checkbox"]').prop("checked",true) ;
+			}
+			else
+			{
+				$('#mc_list_table tbody input[type="checkbox"]').prop("checked" ,false) ;
+			}
+	
+		}); 
+		
+		// shown.bs.moal  show 方法执行此方法立即执行
+		$('#editModel').on('shown.bs.modal', function(e) {
+			loadGpsInfo() ;
+		});
+		
+		function pase2Element(jsonObj)
+		{
+			var key ,value ;
+			$.each(jsonObj ,function(i){
+				 key = i ;
+				 value  =jsonObj[key] ;
+				 $("#dataform input[name='" + key + "'],textarea[name='" + key + "']" ).val( value );
+			})
+			
+		}		
+	});
+</script>
+</html>
