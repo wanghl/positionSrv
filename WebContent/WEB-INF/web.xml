@@ -29,6 +29,13 @@
 		<url-pattern>/taginfor</url-pattern>
 	</servlet-mapping>
 	
+	
+
+    <listener>
+            <listener-class>com.position.servlet.PositionContextListener</listener-class>
+    </listener>
+
+	
 <!-- 	
 	
 	<servlet>

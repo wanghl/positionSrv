@@ -34,7 +34,7 @@ public class RelationData {
 		return paras.get(key) ;
 	}
 	
-	public static boolean isFull()
+	public static boolean isFill()
 	{
 		return isFulled ;
 	}

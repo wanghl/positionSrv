@@ -43,11 +43,11 @@ public class PositionMessageSender extends HttpServlet {
 			connector.getFilterChain().addLast("logger", new PositionLoggingFilter());
 			connector.setHandler(new SenderHandler(connector, timer));
 			connector.setConnectTimeoutMillis(3000);
-			connector.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 2000);
+		//	connector.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 2000);
 			
 			String serverIp ="127.0.0.1";
 			Integer port =8807; 
-			if ( RelationData.isFull() )
+			if ( RelationData.isFill() )
 			{
 				serverIp = (String) RelationData.getInstance().getParas("serverIp") ;
 				port = Integer.parseInt( RelationData.getInstance().getParas("serverPort").toString() ) ;

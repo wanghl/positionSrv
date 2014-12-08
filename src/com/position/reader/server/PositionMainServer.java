@@ -55,6 +55,8 @@ public class PositionMainServer extends HttpServlet{
 					serverPort = Integer.parseInt(port.toString()) ;
 				}
 				connector.bind(new InetSocketAddress(8807));
+				
+				PositionSocketManager.getInstance().buildManager(connector); 
 				log.info("服务启动准备接收阅读器数据，端口: "+ 8807);
 				Timer timer = new Timer() ;
 				TagsStateCheckTask task = new TagsStateCheckTask();
