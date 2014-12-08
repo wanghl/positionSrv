@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
@@ -14,8 +15,8 @@ public class RelationData {
 
 	private static final Logger log = Logger.getLogger(RelationData.class);
 
-	private Map<String, DBInstance> cardInfo = new HashMap<String, DBInstance>();
-	private Map<String, DBInstance> trigger = new HashMap<String, DBInstance>();
+	private ConcurrentHashMap<String, DBInstance> cardInfo = new ConcurrentHashMap<String, DBInstance>();
+	private ConcurrentHashMap<String, DBInstance> trigger = new ConcurrentHashMap<String, DBInstance>();
 	private Map paras = new HashMap() ;
 	
 	private static boolean isFulled = false ;
@@ -32,6 +33,16 @@ public class RelationData {
 	public Object getParas(Object key)
 	{
 		return paras.get(key) ;
+	}
+	
+	public DBInstance getCardInfo(String key)
+	{
+		return cardInfo.get(key) ;
+	}
+	
+	public DBInstance getTrigger(String key)
+	{
+		return trigger.get(key) ;
 	}
 	
 	public static boolean isFill()

@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.apache.mina.core.session.IoSession;
 
+import com.position.message.ReaderMessage;
+import com.position.reader.server.RelationData;
 import com.position.util.MD5Util;
 
 public class DBManager {
@@ -89,5 +91,13 @@ public class DBManager {
 		
 
 	}
+	
+	
+	public void saveTagsChangeLog(ReaderMessage message)
+	{
+		//Object tagUid = RelationData.getInstance().getCardInfo(message.getTagId()).getValue("objuid") ;
+		//Object triggerUid = RelationData.getInstance().getTrigger(message.getNewTrigger())
+	}
+	
 
 }

@@ -65,8 +65,8 @@ public class PositionHandler extends IoHandlerAdapter {
 			DBInstance cardInstance ;
 			for(Entry<String,Map> entry : tagsMap.entrySet())
 			{
-				triggerInstance = dbManager.getTriggerbyId(entry.getValue().get("triggerid").toString()) ;
-				cardInstance = dbManager.getCardbyId(entry.getValue().get("physicalid").toString());
+			    triggerInstance = RelationData.getInstance().getTrigger(entry.getValue().get("triggerid").toString()) ;
+				cardInstance = RelationData.getInstance().getCardInfo(entry.getValue().get("physicalid").toString());
 				map = new HashMap() ;
 				if ( triggerInstance != null && cardInstance != null)
 				{
@@ -81,6 +81,7 @@ public class PositionHandler extends IoHandlerAdapter {
 				
 			}
 			MessageResponse.getInstance().sendIDMessageResponse(session ,messageBody);
+
 		}
 			
 
