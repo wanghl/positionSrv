@@ -2,8 +2,11 @@ package com.position.db;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class DBInstance {
+	
+	
 	
 	public Map<String ,Object> map = new HashMap<String ,Object>() ;
 	
@@ -16,5 +19,40 @@ public class DBInstance {
 	{
 		return map.get(key) ;
 	}
-
+	
+	public String buildInsertSql(String tableName)
+	{
+		
+		StringBuffer sql = new StringBuffer() ;
+		StringBuffer values = new StringBuffer() ;
+		
+	     sql .append( "insert into " + tableName + "(" ) ;
+	
+		values.append(" values(") ;
+		map.keySet().toString() ;
+		
+		for( Entry<String ,Object> entry : map.entrySet())
+		{
+			sql.append( entry.getKey()).append(",");
+			
+			values.append( "?").append(",");
+		}
+		
+		String sqlField = sql.substring(0, sql.length() -1) + ")" ;
+		String sqlValues = values.substring(0,values.length() -1) + ")" ;
+		
+		return sqlField + sqlValues ;
+	}
+	
+	public static void main(String[] argvs)
+	{
+		DBInstance db = new DBInstance() ;
+		
+		db.putValue("objuid", "sssss");
+		db.putValue("aaa", "dddsssss");
+		db.putValue("obbb", "aghgggsssss");
+		
+		System.out.println( db.buildInsertSql("rfid_cardinfor")) ;
+	}
+	
 }

@@ -66,8 +66,9 @@ public class DBOperator {
 
 		return list;
 	}
-
-	public List<DBInstance> saveOrUpdate(String sql, DBInstance parmeter) throws Exception {
+	
+	
+	public void saveOrUpdate(String sql, DBInstance parmeter) throws Exception {
 
 		DBConnection connection = null;
 		PreparedStatement ps = null;
@@ -111,7 +112,7 @@ public class DBOperator {
 
 		}
 
-		return list;
+		//return list;
 
 	}
 

@@ -13,7 +13,9 @@ import org.apache.mina.core.session.IoSession;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.position.db.DBInstance;
 import com.position.reader.server.CardPool;
+import com.position.reader.server.RelationData;
 
 public class SenderTask extends TimerTask {
 	/*
@@ -64,7 +66,30 @@ public class SenderTask extends TimerTask {
 				
 			}
 			
+			String transMode = RelationData.getInstance().getParas("transMode").toString() ;
+			if ( Integer.parseInt( transMode ) == 1)
+			{
+				Object positionBase = RelationData.getInstance().getParas("positionBase") ;
+				for ( Entry<String ,DBInstance> entry : RelationData.getInstance().getCardInfoEntry())
+				{
+					if ( CardPool.getInstance().get(entry.getKey()) == null )
+					{
+						value = new HashMap(); 
+						value.put("cardid", entry.getValue().getValue("physicalid")) ;
+						value.put("userid", entry.getValue().getValue("cardid")) ;
+						value.put("positionx", positionBase) ;
+						value.put("positiony", positionBase) ;
+						value.put("positionz", positionBase) ;
+						
+						set.add(value) ;
+					}
+					
+				}
+			}
+			
 			jsonMap.put("RFID", set); 
+			
+			//System.out.println(JSON.toJSONString(jsonMap)) ;
 			
 			//JSONObject.
 			

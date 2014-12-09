@@ -13,7 +13,6 @@ import org.apache.mina.core.session.IoSession;
 
 import com.position.db.DBInstance;
 import com.position.db.DBManager;
-import com.position.db.DBOperator;
 import com.position.message.IReaderMessage;
 import com.position.message.MessageBodyFactory;
 import com.position.message.MessageResponse;
@@ -59,6 +58,7 @@ public class PositionHandler extends IoHandlerAdapter {
 		case IReaderMessage.MESSAGE_TYPE_IDMESSAGE :
 		//	log.info("上传标签数据(Reader --> Server):" + sb.toString());
 			Map<String ,Map> tagsMap = messageBody.getTagsMap() ;
+			DBManager.newInstance().saveTagsChangeLog(messageBody);
 			Map map ;
 			DBManager dbManager = DBManager.newInstance();
 			DBInstance triggerInstance  ;
@@ -81,6 +81,7 @@ public class PositionHandler extends IoHandlerAdapter {
 				
 			}
 			MessageResponse.getInstance().sendIDMessageResponse(session ,messageBody);
+			
 
 		}
 			

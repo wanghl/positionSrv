@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -28,6 +30,11 @@ public class RelationData {
 
 	public static RelationData getInstance() {
 		return INSTANCE;
+	}
+	
+	public  Set<Entry<String ,DBInstance>> getCardInfoEntry()
+	{
+		return cardInfo.entrySet();   
 	}
 	
 	public Object getParas(Object key)
