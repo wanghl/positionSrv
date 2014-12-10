@@ -75,6 +75,7 @@ public class PositionHandler extends IoHandlerAdapter {
 					map.put("positionx", triggerInstance.getValue("positionx")) ;
 					map.put("positiony", triggerInstance.getValue("positiony")) ;
 					map.put("positionz", triggerInstance.getValue("positionz")) ;
+					map.put("batteryValue", messageBody.getBatteryValue()) ;
 					map.put("updatetime", new Date()) ;
 					CardPool.getInstance().put(cardInstance.getValue("physicalid").toString(), map);
 				}

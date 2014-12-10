@@ -89,6 +89,7 @@ public class TagMessage extends ReaderMessage implements IReaderMessage {
 		}
 		byteBuffer.position(byteBuffer.position() + 4) ;
 		byte state = byteBuffer.get() ; // 状态字节 ；bit7 位表示电池电量
+		
 		setBatteryValue( (byte)((state >> 7) & 0x1) ) ;
 		
 	}

@@ -37,7 +37,6 @@ public class TagsInforServlet extends HttpServlet {
 		PrintWriter pw = response.getWriter();
 		try {
 			Map<Object, Map> map = CardPool.getInstance().getTags();
-			System.out.println(map.size());
 			List<Map> list = new ArrayList<Map>();
 			for (Entry<Object, Map> tags : map.entrySet()) {
 				tags.getValue().put("physicalid", tags.getKey());

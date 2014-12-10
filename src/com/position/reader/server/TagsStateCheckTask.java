@@ -46,7 +46,7 @@ public class TagsStateCheckTask extends TimerTask {
 		long hour = (l / (60 * 60 * 1000) - day * 24);
 		long min = ((l / (60 * 1000)) - day * 24 * 60 - hour * 60);
 		long s = (l / 1000 - day * 24 * 60 * 60 - hour * 60 * 60 - min * 60);
-		if (day > 0 || hour > 0 || min > 0 || s >= 6)
+		if (day > 0 || hour > 0 || min > 0 || s >= 2)
 			return false;
 		return true;
 	}

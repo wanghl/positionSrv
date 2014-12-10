@@ -22,37 +22,6 @@ public class DBManager {
 		return new DBManager() ;
 	}
 	
-	public void insertTcpConnectRecord()
-	{
-		
-	}
-	
-	public DBInstance getTriggerbyId(String id) throws SQLException
-	{
-		String sql = "select * from rfid_trigger where triggerid='" + id + "'" ;
-		List<DBInstance> list = DBOperator.createInstance().query(sql, null) ;
-		if ( list.isEmpty() )
-		{
-			return null ;
-		}
-		else
-		{
-			return list.get(0) ;
-		}
-	}
-	public DBInstance getCardbyId(String id) throws SQLException
-	{
-		String sql = "select * from rfid_cardinfor where physicalid='" + id + "'" ;
-		List<DBInstance> list = DBOperator.createInstance().query(sql, null) ;
-		if ( list.isEmpty() )
-		{
-			return null ;
-		}
-		else
-		{
-			return list.get(0) ;
-		}
-	}
 	
 	public void sotreTcpConnectionChanges(IoSession session,int connectType) throws Exception
 	{
@@ -81,13 +50,12 @@ public class DBManager {
 		}
 		else
 		{
-			sql = "insert into rfid_tcpipconnect (objuid,inip,inport,connectType) values(?,?,?,?)" ;
 			DBInstance db = new DBInstance() ;
 			db.putValue("objuid", MD5Util.getObjuid());
 			db.putValue("inip", ip);
 			db.putValue("inport", port);
 			db.putValue("connectType", connectType);
-			DBOperator.createInstance().saveOrUpdate(sql, db) ;
+			DBOperator.createInstance().saveOrUpdate(db.buildInsertSql("rfid_tcpipconnect"),db) ;
 		}
 		
 		

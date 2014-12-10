@@ -44,15 +44,5 @@ public class DBInstance {
 		return sqlField + sqlValues ;
 	}
 	
-	public static void main(String[] argvs)
-	{
-		DBInstance db = new DBInstance() ;
-		
-		db.putValue("objuid", "sssss");
-		db.putValue("aaa", "dddsssss");
-		db.putValue("obbb", "aghgggsssss");
-		
-		System.out.println( db.buildInsertSql("rfid_cardinfor")) ;
-	}
 	
 }

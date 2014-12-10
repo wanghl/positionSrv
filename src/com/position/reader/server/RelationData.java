@@ -27,6 +27,17 @@ public class RelationData {
 
 	private RelationData() {
 	}
+	
+	public void updateCardInfo(ConcurrentHashMap<String,DBInstance> map)
+	{
+		this.cardInfo  = map ; 
+	}
+	
+	public void updateTrigger(ConcurrentHashMap<String,DBInstance> map)
+	{
+		this.trigger = map  ;
+	}
+	
 
 	public static RelationData getInstance() {
 		return INSTANCE;
@@ -34,6 +45,7 @@ public class RelationData {
 	
 	public  Set<Entry<String ,DBInstance>> getCardInfoEntry()
 	{
+		
 		return cardInfo.entrySet();   
 	}
 	
@@ -80,5 +92,6 @@ public class RelationData {
 			log.error("数据初始化失败" + e);
 		}
 	}
+	
 
 }

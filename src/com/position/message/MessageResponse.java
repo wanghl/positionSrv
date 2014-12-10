@@ -50,7 +50,6 @@ public class MessageResponse {
 		crc[4] = tagMessage.getTagCount();
 
 		String checkCode = CRC16Utils.getCrc(crc);
-		System.out.println(checkCode);
 		if ( checkCode.length() == 3)
 		{
 			byteBuffer.put((byte) Integer.parseInt("0" + checkCode.charAt(0), 16));
@@ -171,10 +170,6 @@ public class MessageResponse {
 
 	}
 
-	public static void main(String[] argvs)
 
-	{
-		System.out.println("71f".substring(1,3));
-	}
 
 }
