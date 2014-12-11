@@ -74,6 +74,7 @@ public class RelationData {
 			DBOperator dbOperator = DBOperator.createInstance() ;
 			List<DBInstance> list = dbOperator .query("select * from rfid_cardinfor", null);
 			for (DBInstance db : list) {
+				
 				cardInfo.put(db.getValue("physicalid").toString(), db);
 			}
 			list =dbOperator.query("select * from rfid_trigger", null);

@@ -57,10 +57,11 @@ public class SenderTask extends TimerTask {
 			{
 				value = new HashMap() ;
 				value.put("cardid", entry.getKey()) ;
-				value.put("userid", entry.getValue().get("cardid")) ;
-				value.put("positionx", entry.getValue().get("positionx")) ;
-				value.put("positiony", entry.getValue().get("positiony")) ;
-				value.put("positionz", entry.getValue().get("positionz")) ;
+				value.put("userid", ( entry.getValue().get("cardid") == null  ||  entry.getValue().get("cardid").equals("")) ? "-1" : entry.getValue().get("cardid") ) ;
+				value.put("positionx", ( entry.getValue().get("positionx") == null ||  entry.getValue().get("positionx").equals("")) ? "-1" : entry.getValue().get("positionx") ) ;
+				value.put("positiony", ( entry.getValue().get("positiony") == null ||  entry.getValue().get("positiony").equals("")) ? "-1" : entry.getValue().get("positiony") ) ;
+				value.put("positionz",( entry.getValue().get("positionz") == null ||  entry.getValue().get("positionz").equals("")) ? "-1" : entry.getValue().get("positionz") ) ;
+				value.put("glassesid", (entry.getValue().get("glassesid") == null ||  entry.getValue().get("glassesid").equals("")) ? "-1" : entry.getValue().get("glassesid")) ;
 				
 				set.add(value) ;
 				
@@ -76,7 +77,8 @@ public class SenderTask extends TimerTask {
 					{
 						value = new HashMap(); 
 						value.put("cardid", entry.getValue().getValue("physicalid")) ;
-						value.put("userid", entry.getValue().getValue("cardid")) ;
+						value.put("userid", ( entry.getValue().getValue("cardid") == null ) ? "-1" : entry.getValue().getValue("cardid") ) ;
+						value.put("glassesid", (entry.getValue().getValue("glassesid") == null ) ? "-1" : entry.getValue().getValue("glassesid")) ;
 						value.put("positionx", positionBase) ;
 						value.put("positiony", positionBase) ;
 						value.put("positionz", positionBase) ;
