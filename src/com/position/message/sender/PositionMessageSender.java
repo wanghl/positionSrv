@@ -43,11 +43,11 @@ public class PositionMessageSender extends HttpServlet {
 			connector.getFilterChain().addLast("logger", new PositionLoggingFilter());
 			connector.setHandler(new SenderHandler(connector, timer));
 			connector.setConnectTimeoutMillis(3000);
-			connector.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 2000);
+		//	connector.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 2000);
 			
 			String serverIp ="127.0.0.1";
 			Integer port =8807; 
-			if ( RelationData.isFull() )
+			if ( RelationData.isFill() )
 			{
 				serverIp = (String) RelationData.getInstance().getParas("serverIp") ;
 				port = Integer.parseInt( RelationData.getInstance().getParas("serverPort").toString() ) ;
@@ -69,9 +69,6 @@ public class PositionMessageSender extends HttpServlet {
 					break;
 				} catch (RuntimeIoException e) {
 					// System.err.println(&quot;Failed to connect.&quot;);
-					 e.printStackTrace();
-					 
-					 log.error(e);
 					log.error("连接服务器失败! 5秒后重连");
 					try {
 						Thread.sleep(5000);
@@ -83,7 +80,18 @@ public class PositionMessageSender extends HttpServlet {
 			}
 
 			SenderTask task = new SenderTask();
-			timer.schedule(task, 30, 30);
+			
+			Object sendIntervalValue = RelationData.getInstance().getParas("sendInterval") ;
+			
+			Integer sendInterval = 30 ;
+			
+			if ( sendIntervalValue != null)
+			{
+				sendInterval = Integer.parseInt( sendIntervalValue.toString() ) ;
+			}
+			
+			timer.schedule(task, sendInterval, sendInterval);
+			
 			future.awaitUninterruptibly();
 			// wait until the summation is done
 			// session.getCloseFuture().awaitUninterruptibly();

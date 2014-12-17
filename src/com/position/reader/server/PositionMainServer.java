@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 
 import org.apache.log4j.Logger;
 import org.apache.mina.core.service.IoAcceptor;
+import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
@@ -43,7 +44,7 @@ public class PositionMainServer extends HttpServlet{
 				connector.getFilterChain().addLast("excuteThreadPool", new ExecutorFilter(ThreadPoolManager.getThreadPoolInstance()));
 				connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ReaderProtocolCodeFactory()));
 				connector.setHandler(new PositionHandler());
-				// connector.getSessionConfig().setIdleTime(IdleStatus.READER_IDLE,
+				connector.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE ,40) ;
 				// timeOut);
 				// PositionMessageSender sender = new PositionMessageSender() ;
 				// Thread senderThread = new Thread(sender) ;
@@ -55,6 +56,8 @@ public class PositionMainServer extends HttpServlet{
 					serverPort = Integer.parseInt(port.toString()) ;
 				}
 				connector.bind(new InetSocketAddress(8807));
+				
+				PositionSocketManager.getInstance().buildManager(connector); 
 				log.info("服务启动准备接收阅读器数据，端口: "+ 8807);
 				Timer timer = new Timer() ;
 				TagsStateCheckTask task = new TagsStateCheckTask();
@@ -69,6 +72,12 @@ public class PositionMainServer extends HttpServlet{
 			}
 		}
 
+	}
+	
+	public static void main(String[] argvs)
+	{
+		PositionMainServer r = new PositionMainServer() ;
+		r.init();  
 	}
 
 }

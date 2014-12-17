@@ -6,8 +6,14 @@ import java.net.UnknownHostException;
 
 import org.apache.mina.core.buffer.IoBuffer;
 
+/**
+ * @author whlzcy
+ *
+ * 模拟一个阅读器发送数据 
+ */
 public class ImitateReader {
 	private final static String MESSAGE = "ffffffff83d3c10200cf7338c00400370a1f0000c66c0e324f324fffffffff030354770d801f0000c64e0b324f324fffffffff030354770d811f0000c6660c324f324fffffffff030454770d811f0000c64710324f324fffffffff030454770d821f0000c67911324f324fffffffff030354770d811f0000c61612324f324fffffffff030354770d801f0000c65706324f324fffffffff030454770d821f0000c65308324f324fffffffff030454770d811f0000c61515324f324fffffffff030354770d811f0000c65810324f324fffffffff030454770d81";
+//	private final static String MESSAGE = "ffffffff7efdc102002f2f3ac0040033021f0000c63a0432863286ffffffff0301548dc2101f0000c63a0132863286ffffffff0301548dc211";
 	static IoBuffer buffer = IoBuffer.allocate(217);
 
 	static {

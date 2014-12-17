@@ -1,8 +1,10 @@
 package com.position.reader.server;
 
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -25,7 +27,6 @@ public class PositionHandler extends IoHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
-	
 		log.error(cause);
 	}
 	
@@ -43,6 +44,7 @@ public class PositionHandler extends IoHandlerAdapter {
 			}
 			sb.append( hv ) ;
 		}
+		
 		log.info("开始解析" + sb.toString());
 		
 		MessageBodyFactory factory = new MessageBodyFactory();
@@ -52,20 +54,31 @@ public class PositionHandler extends IoHandlerAdapter {
 		switch (messageBody.getCommandCode()) {
 
 		case IReaderMessage.MESSAGE_TYPE_TIME:
-		//	log.info("校时报文(Reader --> Server)：" + sb.toString());
+			log.info("收到阅读器开机发送的校时报文: " +  sb.toString());
+			
+			session.setAttribute("readerId" ,messageBody.getReaderId()) ;
 			MessageResponse.getInstance().sendTimeCheckResponse(session, messageBody);
-
+			log.info("与阅读器连接正式完成，准备接收标签信息");
+			break ;
+		case IReaderMessage.MESSAGE_TYPE_HEARTBEAT:
+			
+			log.info("收到阅读器心跳报文: "  + sb.toString());
+			MessageResponse.getInstance().sendHeartBeatResponse(session, messageBody); 
+			DBManager.newInstance().saveReaderHeartBeat(Integer.toString( messageBody.getReaderId()));
+			break ;
 		case IReaderMessage.MESSAGE_TYPE_IDMESSAGE :
-		//	log.info("上传标签数据(Reader --> Server):" + sb.toString());
+			log.info("收到阅读器上传标签数据(Reader --> Server):" + sb.toString());
+			
 			Map<String ,Map> tagsMap = messageBody.getTagsMap() ;
+			DBManager.newInstance().saveTagsChangeLog(messageBody);
 			Map map ;
 			DBManager dbManager = DBManager.newInstance();
 			DBInstance triggerInstance  ;
 			DBInstance cardInstance ;
 			for(Entry<String,Map> entry : tagsMap.entrySet())
 			{
-				triggerInstance = dbManager.getTriggerbyId(entry.getValue().get("triggerid").toString()) ;
-				cardInstance = dbManager.getCardbyId(entry.getValue().get("physicalid").toString());
+			    triggerInstance = RelationData.getInstance().getTrigger(entry.getValue().get("triggerid").toString()) ;
+				cardInstance = RelationData.getInstance().getCardInfo(entry.getValue().get("physicalid").toString());
 				map = new HashMap() ;
 				if ( triggerInstance != null && cardInstance != null)
 				{
@@ -74,13 +87,20 @@ public class PositionHandler extends IoHandlerAdapter {
 					map.put("positionx", triggerInstance.getValue("positionx")) ;
 					map.put("positiony", triggerInstance.getValue("positiony")) ;
 					map.put("positionz", triggerInstance.getValue("positionz")) ;
+					map.put("glassesid", cardInstance.getValue("glassesid")) ;
+					map.put("batteryValue", messageBody.getBatteryValue()) ;
 					map.put("updatetime", new Date()) ;
 					CardPool.getInstance().put(cardInstance.getValue("physicalid").toString(), map);
 				}
 				
 			}
 			MessageResponse.getInstance().sendIDMessageResponse(session ,messageBody);
+			
+			break ;
+		default :
+			log.info("报文类型无法识别 ");
 		}
+			
 			
 
 	}
@@ -89,6 +109,7 @@ public class PositionHandler extends IoHandlerAdapter {
 	public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
 		//log.info(status);
 	}
+	
 	
 
 

@@ -15,10 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import com.position.reader.server.CardPool;
+import com.position.reader.server.TagsInforConsumeQueue;
 import com.position.util.PositionUtil;
 
-public class TagsInforServlet extends HttpServlet {
-	private static Logger log = Logger.getLogger(TagsInforServlet.class) ;
+public class TagsConsumeServlet extends HttpServlet {
+	private static Logger log = Logger.getLogger(TagsConsumeServlet.class);
 	/**
 	 * 
 	 */
@@ -36,25 +37,22 @@ public class TagsInforServlet extends HttpServlet {
 		response.setCharacterEncoding("utf-8");
 		PrintWriter pw = response.getWriter();
 		try {
-			Map<Object, Map> map = CardPool.getInstance().getTags();
-			List<Map> list = new ArrayList<Map>();
-			for (Entry<Object, Map> tags : map.entrySet()) {
-				tags.getValue().put("physicalid", tags.getKey());
-
-				list.add(tags.getValue());
+			if (TagsInforConsumeQueue.getInstance().isEmpty()) {
+				pw.write("");
 			}
-
-			String html = PositionUtil.createHtmlContent(list, "tagInfor.ftl");
-			pw.print(html);
+			else{
+				Map<String ,Object > tag = TagsInforConsumeQueue.getInstance().takeOne() ;
+				
+				String html = PositionUtil.createHtmlContent(tag, "tagInforConsume.ftl");
+				pw.print(html);
+			}
 		} catch (Exception e) {
 			pw.print("");
 			log.error(e);
-			
-		}
-		finally{
-			if ( pw != null)
-			{
-				pw.close(); 
+
+		} finally {
+			if (pw != null) {
+				pw.close();
 			}
 		}
 	}

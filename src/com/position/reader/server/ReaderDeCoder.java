@@ -36,10 +36,7 @@ public class ReaderDeCoder extends CumulativeProtocolDecoder {
 		// 校验收到的消息长度，处理断包
 		if( Integer.toHexString(b[0] & 0xff).equals("ff"))
 		{
-			if ( ( b[13] &0xff) == 5)
-			{
-				System.out.println( sb.toString() ) ;
-			}
+			
 			int length = getMessageLength(b) ;
 			if ( (length + 10 ) == b.length ) 
 			{
@@ -47,7 +44,6 @@ public class ReaderDeCoder extends CumulativeProtocolDecoder {
 			}
 			else if ( (length + 10) > b.length)
 			{
-				System.out.println("断包 ： "+ sb.toString()) ;
 				IoBuffer ioBuffer = (IoBuffer) arg0.getAttribute("messageBuffer") ;
 				ioBuffer.put(b) ;
 				int afterLength = getMessageLength(ioBuffer.array());
@@ -62,7 +58,6 @@ public class ReaderDeCoder extends CumulativeProtocolDecoder {
 		}
 		else
 		{
-			System.out.println("断包 ： +++++ "+ sb.toString()) ;
 			IoBuffer ioBuffer = (IoBuffer) arg0.getAttribute("messageBuffer") ;
 			ioBuffer.put(b);
 			arg2.write(ioBuffer.array());

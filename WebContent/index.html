@@ -8,6 +8,7 @@
 <script src="js/jquery-1.11.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/position.js"></script>
+<script src="js/ajax-pushlet-client.js"></script>
 </head>
 <body style="background-color: #eee;">
 	<nav class="navbar navbar-inverse" role="navigation">
@@ -31,6 +32,61 @@
 				</div>
 			</div>
 			<div class="col-md-10">
+			
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<span class="label label-danger">调试信息</span>
+					</div>
+					<div class="panel-body">
+						<table class="table table-hover" id="readerDebug">
+							<thead>
+								<tr>
+									<th>序号</th>
+									<th>卡号</th>
+									<th>阅读器ID</th>
+									<th>新触发器ID</th>
+									<th>旧触发器ID</th>
+									<th>电池电量</th>
+									<th>被扫描次数</th>
+									<th>数据接收时间</th>
+
+								</tr>
+							</thead>
+							<tbody>
+								<tr></tr>
+							</tbody>
+						</table>
+
+					</div>
+				</div>
+				
+				
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<span class="label label-danger">阅读器信息</span>
+					</div>
+					<div class="panel-body">
+						<table class="table table-hover" id="readerInfor">
+							<thead>
+								<tr>
+									<th>序号</th>
+									<th>IP地址</th>
+									<th>端口</th>
+									<th>阅读器ID</th>
+									<th>阅读器名称</th>
+									<th>安装位置</th>
+									<th>最后一次心跳时间</th>
+									<th>页面刷新时间</th>
+
+								</tr>
+							</thead>
+							<tbody>
+								<tr></tr>
+							</tbody>
+						</table>
+
+					</div>
+				</div>
 
 				<div class="panel panel-default">
 					<div class="panel-heading">
@@ -43,6 +99,7 @@
 									<th>序号</th>
 									<th>标签编号</th>
 									<th>自定义卡号</th>
+									<th>电池电量</th>
 									<th>x坐标</th>
 									<th>y坐标</th>
 									<th>z坐标</th>
@@ -65,6 +122,17 @@
 	</div>
 </body>
 <script type="text/javascript">
+
+	function getTagsInforDebug() {
+
+		var v = callServlet("/positionsrv/consumeinfor", null, 'html');
+		//$('#readerDebug tbody tr').remove();
+		if (typeof (v.error_code) == "undefined") {
+			$('#readerDebug tbody').append(v);
+		} 
+	}
+	
+
 	function getTagsInfor() {
 
 		var v = callServlet("/positionsrv/taginfor", null, 'html');
@@ -75,9 +143,22 @@
 			$('#positionInfor tbody tr').remove();
 		}
 	}
-	getTagsInfor();
+	
+	function getReaderInfor() {
+
+		var v = callServlet("/positionsrv/readerinfor", null, 'html');
+		$('#readerInfor tbody tr').remove();
+		if (typeof (v.error_code) == "undefined") {
+			$('#readerInfor tbody').append(v);
+		} else {
+			$('#readerInfor tbody tr').remove();
+		}
+	}
+	// getReaderInfor()
+	//getTagsInfor();
+	getTagsInforDebug() ;
 	$(function() {
-		setInterval("getTagsInfor()", 500);
+		setInterval("getTagsInforDebug()", 500);
 	});
 </script>
 </html>

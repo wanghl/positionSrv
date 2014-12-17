@@ -10,6 +10,8 @@ import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 
+import com.position.db.DBManager;
+
 public class IOControler extends IoFilterAdapter {
 	
 	private static final Logger log = Logger.getLogger(IOControler.class) ;
@@ -24,6 +26,8 @@ public class IOControler extends IoFilterAdapter {
 		ioBuffer.setAutoShrink(true) ;
 		session.setAttribute("messageBuffer" , ioBuffer) ;
 		
+		DBManager.newInstance().sotreTcpConnectionChanges(session, 0);
+		
 		nextFilter.sessionOpened(session);
 
 	}
@@ -36,8 +40,29 @@ public class IOControler extends IoFilterAdapter {
 	}
 	
 	public void sessionIdle(IoFilter.NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
+		
+		session.close(false) ;
+		
 		nextFilter.sessionIdle(session, status);
 	}
+	
+
+	
+	public void sessionClosed(IoFilter.NextFilter nextFilter, IoSession session) throws Exception {
+		DBManager.newInstance().sotreTcpConnectionChanges(session, 0);
+	//	session.close(false) ;
+		nextFilter.sessionClosed(session);
+	}
+	
+	public void exceptionCaught(IoFilter.NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {
+	//	session.close(false) ;
+		cause.printStackTrace(); 
+		nextFilter.exceptionCaught(session, cause);
+	}
+
+
+
+	
 
 
 

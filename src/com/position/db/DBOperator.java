@@ -11,6 +11,10 @@ import org.apache.log4j.Logger;
 
 import com.zephyr.sql.DBConnection;
 
+/**
+ * @author whlzcy
+ * Êý¾Ý¿âµ×²ã²Ù×÷
+ */
 public class DBOperator {
 	
 	private DBOperator() {};
@@ -66,8 +70,9 @@ public class DBOperator {
 
 		return list;
 	}
-
-	public List<DBInstance> saveOrUpdate(String sql, DBInstance parmeter) throws Exception {
+	
+	
+	public void saveOrUpdate(String sql, DBInstance parmeter) throws Exception {
 
 		DBConnection connection = null;
 		PreparedStatement ps = null;
@@ -111,7 +116,7 @@ public class DBOperator {
 
 		}
 
-		return list;
+		//return list;
 
 	}
 

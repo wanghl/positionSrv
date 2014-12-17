@@ -37,6 +37,11 @@ public class ReaderMessage {
 	public void setScanTimes(int scanTimes) {
 		this.scanTimes = scanTimes;
 	}
+	
+	public int getReaderId()
+	{
+		return (getReaderAddress()[0] & 0xff) + ( getReaderAddress()[1] & 0xff ) ;
+	}
 
 	public byte[] getReaderAddress() {
 		return readerAddress;

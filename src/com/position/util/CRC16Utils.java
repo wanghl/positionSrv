@@ -16,7 +16,6 @@ public class CRC16Utils {
 			}
 		}
 		crc &= 0xffff;
-		System.out.println("======" +  crc ) ;
 		return Integer.toHexString( crc ) ;
 	}
 	

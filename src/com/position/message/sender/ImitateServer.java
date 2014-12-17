@@ -6,13 +6,18 @@ import java.io.*;
 import java.net.*;
 import java.util.Date;
 
-public class BootInTestServer extends Thread {
+/**
+ * @author whlzcy
+ *
+ * 模拟一个上级服务，测试用。用来测试本地发送的数据是否正确
+ */
+public class ImitateServer extends Thread {
 	ServerSocket server = null;
 	Socket sk = null;
 	BufferedReader rdr = null;
 	PrintWriter wtr = null;
 
-	public BootInTestServer() {
+	public ImitateServer() {
 
 		try {
 			server = new ServerSocket(9001);
@@ -39,7 +44,7 @@ public class BootInTestServer extends Thread {
 	}
 
 	public static void main(String[] args) {
-		new BootInTestServer().start();
+		new ImitateServer().start();
 	}
 
 	class ServerThread extends Thread {
