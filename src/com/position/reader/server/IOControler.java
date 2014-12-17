@@ -27,6 +27,7 @@ public class IOControler extends IoFilterAdapter {
 		session.setAttribute("messageBuffer" , ioBuffer) ;
 		
 		DBManager.newInstance().sotreTcpConnectionChanges(session, 0);
+		
 		nextFilter.sessionOpened(session);
 
 	}
@@ -39,6 +40,9 @@ public class IOControler extends IoFilterAdapter {
 	}
 	
 	public void sessionIdle(IoFilter.NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
+		
+		session.close(false) ;
+		
 		nextFilter.sessionIdle(session, status);
 	}
 	
@@ -46,9 +50,16 @@ public class IOControler extends IoFilterAdapter {
 	
 	public void sessionClosed(IoFilter.NextFilter nextFilter, IoSession session) throws Exception {
 		DBManager.newInstance().sotreTcpConnectionChanges(session, 0);
-
+	//	session.close(false) ;
 		nextFilter.sessionClosed(session);
 	}
+	
+	public void exceptionCaught(IoFilter.NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {
+	//	session.close(false) ;
+		cause.printStackTrace(); 
+		nextFilter.exceptionCaught(session, cause);
+	}
+
 
 
 	

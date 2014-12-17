@@ -22,6 +22,53 @@ public class MessageResponse {
 	public static MessageResponse getInstance() {
 		return new MessageResponse();
 	}
+	
+	public void sendHeartBeatResponse(IoSession session ,ReaderMessage heartBeat)
+	{
+		ByteBuffer byteBuffer = ByteBuffer.allocate(16);
+		byteBuffer.put((byte) 0xff);
+		byteBuffer.put((byte) 0xff);
+		byteBuffer.put((byte) 0xff);
+		byteBuffer.put((byte) 0xff);
+
+		byteBuffer.put((byte) 0xCB);
+		byteBuffer.put((byte) 0xB6);
+
+		byteBuffer.put((byte) 0xC1);
+		byteBuffer.put((byte) 0x02);
+		byteBuffer.put((byte) 0x00);
+		byteBuffer.put((byte) 0x06);
+		
+		byte[] crc = new byte[4];
+
+		crc[0] = 0x40;
+		crc[1] = 0x05;
+		crc[2] = heartBeat.getReaderAddress()[0];
+		crc[3] = heartBeat.getReaderAddress()[1];
+
+		String checkCode = CRC16Utils.getCrc(crc);
+		if ( checkCode.length() == 3)
+		{
+			byteBuffer.put((byte) Integer.parseInt("0" + checkCode.charAt(0), 16));
+			byteBuffer.put((byte) Integer.parseInt(checkCode.substring(1, 3), 16));
+			
+		}
+		else
+		{
+			byteBuffer.put((byte) Integer.parseInt(checkCode.substring(0, 2), 16));
+			byteBuffer.put((byte) Integer.parseInt(checkCode.substring(2, 4), 16));
+		}
+		
+		byteBuffer.put((byte) 0x40);
+		byteBuffer.put((byte) 0x05);
+		byteBuffer.put(heartBeat.getReaderAddress()[0]);
+		byteBuffer.put(heartBeat.getReaderAddress()[1]);
+		
+		log.info("心跳报文应答(Server --> Reader) : " + parseMessage(byteBuffer.array()));
+
+		session.write(byteBuffer.array());
+		
+	}
 
 	public void sendIDMessageResponse(IoSession session, ReaderMessage tagMessage) {
 		try{
@@ -69,17 +116,8 @@ public class MessageResponse {
 		byteBuffer.put(tagMessage.getTagCount());
 
 		byte[] readerBuffer = byteBuffer.array();
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < readerBuffer.length; i++) {
-			int v = readerBuffer[i] & 0xff;
-			String hv = Integer.toHexString(v);
-			if (hv.length() < 2) {
-				sb.append(0);
-			}
-			sb.append(hv);
-		}
-
-		log.info("卡信息应答(Server --> Reader) : " + sb.toString());
+	
+		log.info("卡信息应答(Server --> Reader) : " +parseMessage(readerBuffer));
 
 		session.write(byteBuffer.array());
 		}catch(Exception e)
@@ -141,25 +179,30 @@ public class MessageResponse {
 			byteBuffer.put((byte) Integer.parseInt(unixHexTime.substring(4, 6), 16));
 			byteBuffer.put((byte) Integer.parseInt(unixHexTime.substring(6, 8), 16));
 			byte[] readerBuffer = byteBuffer.array();
-			StringBuffer sb = new StringBuffer();
-			for (int i = 0; i < readerBuffer.length; i++) {
-				int v = readerBuffer[i] & 0xff;
-				String hv = Integer.toHexString(v);
-				if (hv.length() < 2) {
-					sb.append(0);
-				}
-				sb.append(hv);
-			}
-
+			
 			// System.out.println( "====================" + sb.toString()) ;*/
 			// byteBuffer.flip() ;
-			log.info("校时报文回复(Server --> Reader) :" + sb.toString());
+			log.info("校时报文回复(Server --> Reader) :" + parseMessage(readerBuffer));
 			session.write(byteBuffer.array());
 
 		} catch (Exception e) {
 			log.error("组校时应答报文出错，操作放弃。");
 		}
 
+	}
+	
+	private String parseMessage(byte[] readerBuffer)
+	{
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < readerBuffer.length; i++) {
+			int v = readerBuffer[i] & 0xff;
+			String hv = Integer.toHexString(v);
+			if (hv.length() < 2) {
+				sb.append(0);
+			}
+			sb.append(hv);
+		}
+		return sb.toString() ;
 	}
 
 	private long getUnixTime() throws ParseException {
@@ -169,6 +212,7 @@ public class MessageResponse {
 		return date.getTime() / 1000;
 
 	}
+
 
 
 

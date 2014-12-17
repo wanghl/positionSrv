@@ -4,6 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ * @author whlzcy
+ * 
+ * 代表一个数据库表对象。用来封装数据库操作结果 生成SQL语句 或传递参数
+ *
+ */
 public class DBInstance {
 	
 	
@@ -43,6 +49,7 @@ public class DBInstance {
 		
 		return sqlField + sqlValues ;
 	}
+	
 	
 	
 }

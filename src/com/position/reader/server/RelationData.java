@@ -19,7 +19,8 @@ public class RelationData {
 
 	private ConcurrentHashMap<String, DBInstance> cardInfo = new ConcurrentHashMap<String, DBInstance>();
 	private ConcurrentHashMap<String, DBInstance> trigger = new ConcurrentHashMap<String, DBInstance>();
-	private Map paras = new HashMap() ;
+	private ConcurrentHashMap<String, DBInstance> reader = new ConcurrentHashMap<String, DBInstance>();
+	private ConcurrentHashMap paras = new ConcurrentHashMap() ;
 	
 	private static boolean isFulled = false ;
 
@@ -36,6 +37,16 @@ public class RelationData {
 	public void updateTrigger(ConcurrentHashMap<String,DBInstance> map)
 	{
 		this.trigger = map  ;
+	}
+	
+	public void updateReader(ConcurrentHashMap<String,DBInstance> map)
+	{
+		this.reader = map  ;
+	}
+	
+	public void updateParas(ConcurrentHashMap map)
+	{
+		this.paras = map ;
 	}
 	
 
@@ -64,6 +75,16 @@ public class RelationData {
 		return trigger.get(key) ;
 	}
 	
+	public DBInstance getReaderById(String key)
+	{
+		return reader.get(key) ;
+	}
+	
+	public void setReaderInfor(String readerId ,DBInstance db )
+	{
+		reader.put(readerId, db) ;
+	}
+	
 	public static boolean isFill()
 	{
 		return isFulled ;
@@ -86,6 +107,12 @@ public class RelationData {
 			for( DBInstance db: list)
 			{
 				paras.put(db.getValue("paras_key"), db.getValue("paras_value")) ;
+			}
+			
+			list = dbOperator.query("select * from rfid_reader", null) ;
+			for( DBInstance db: list)
+			{
+				reader.put(db.getValue("readerid").toString(), db) ;
 			}
 			this.isFulled = true ;
 		} catch (SQLException e) {

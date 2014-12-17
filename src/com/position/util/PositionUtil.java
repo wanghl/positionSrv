@@ -2,15 +2,25 @@ package com.position.util;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 public class PositionUtil {
+	
+	
+	public static String createHtmlContent(Map map ,String templateFileNam)
+	{
+		List l = new ArrayList() ;
+		l.add(map);
+		return createHtmlContent(l ,templateFileNam) ;
+	}
 	
 
 	public static String createHtmlContent(List list, String templateFilenName) {

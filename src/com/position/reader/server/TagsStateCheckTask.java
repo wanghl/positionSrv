@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
+import org.apache.mina.core.session.IoSession;
 
 public class TagsStateCheckTask extends TimerTask {
 	
@@ -17,6 +18,8 @@ public class TagsStateCheckTask extends TimerTask {
 	public void run() {
 
 		//Map<Object, Map> map = CardPool.getInstance().getTags();
+		
+		
 		try {
 
 			for (Entry<Object, Map> entry : CardPool.getInstance().getTags().entrySet()) {
@@ -36,7 +39,18 @@ public class TagsStateCheckTask extends TimerTask {
 	}
 
 	public boolean isTagAlive(Date updatedate) throws ParseException {
+		
+		Object ssObj = RelationData.getInstance().getParas("tagOutInterval")  ;
+		
+		Integer ss = 2; 
+		
+		if ( ssObj != null)
+		{
+			ss = Integer.parseInt( ssObj.toString()) ;
+		}
+		
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
 		Calendar calendar = Calendar.getInstance();
 
 		java.util.Date now = df.parse(df.format(calendar.getTime()));
@@ -46,7 +60,7 @@ public class TagsStateCheckTask extends TimerTask {
 		long hour = (l / (60 * 60 * 1000) - day * 24);
 		long min = ((l / (60 * 1000)) - day * 24 * 60 - hour * 60);
 		long s = (l / 1000 - day * 24 * 60 * 60 - hour * 60 * 60 - min * 60);
-		if (day > 0 || hour > 0 || min > 0 || s >= 2)
+		if (day > 0 || hour > 0 || min > 0 || s >= ss)
 			return false;
 		return true;
 	}

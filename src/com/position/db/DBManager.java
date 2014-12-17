@@ -3,9 +3,11 @@ package com.position.db;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.apache.mina.core.session.IoSession;
 
 import com.position.message.ReaderMessage;
@@ -13,13 +15,36 @@ import com.position.reader.server.CardPool;
 import com.position.reader.server.RelationData;
 import com.position.util.MD5Util;
 
+/**
+ * @author whlzcy
+ *
+ * 数据库操作的封装
+ */
 public class DBManager {
+	
+	
+	private static final Logger log = Logger.getLogger(DBManager.class ) ;
 	
 	private DBManager(){} ;
 	
 	public static DBManager newInstance()
 	{
 		return new DBManager() ;
+	}
+	
+	public void saveReaderHeartBeat(String readerId) throws Exception 
+	{
+		DBInstance readerInstance = RelationData.getInstance().getReaderById(readerId) ;
+		if ( readerInstance == null )
+		{
+			return ;
+		}
+		String sql = "update rfid_reader set heartbeat_time=now() where objuid='" + readerInstance.getValue("objuid").toString() + "'" ;
+		DBOperator.createInstance().saveOrUpdate(sql, null);
+		
+		readerInstance.putValue("heartbeat_time", new Date());
+		RelationData.getInstance().setReaderInfor(readerId, readerInstance);
+		
 	}
 	
 	
@@ -66,14 +91,27 @@ public class DBManager {
 	public void saveTagsChangeLog(ReaderMessage message) throws Exception
 	{
 		DBInstance db = new DBInstance() ;
-		Object tagUid = RelationData.getInstance().getCardInfo(message.getTagId()).getValue("objuid") ;
-		String newTrigger = Integer.toString(message.getNewTrigger()) ;
-		Object triggerUid = RelationData.getInstance().getTrigger(newTrigger).getValue("objuid")  ;
-		
-		if ( tagUid == null || triggerUid == null )
+		Object tagUid = RelationData.getInstance().getCardInfo(message.getTagId());
+		if( tagUid == null){
+			log.warn("编号为 " + message.getTagId() + " 的标签未注册");
 			return ;
+		}else{
+			tagUid = RelationData.getInstance().getCardInfo(message.getTagId()).getValue("objuid") ;
+		}
+		String newTrigger = Integer.toString(message.getNewTrigger()) ;
+		Object triggerUid = RelationData.getInstance().getTrigger(newTrigger) ;
 		
+		if ( triggerUid == null ){
+			log.warn("编号为 " + newTrigger + " 的触发器器未注册");
+			return ;
+		}
+		else
+		{
+			triggerUid = RelationData.getInstance().getTrigger(newTrigger).getValue("objuid")  ;
+		}
 		Object positionBase = RelationData.getInstance().getParas("positionBase") ;
+		if ( positionBase == null )
+			positionBase = 10000000 ;
 		Map tagMap = CardPool.getInstance().get(message.getTagId()) ;
 		db.putValue("objuid", MD5Util.getObjuid());
 		db.putValue("carduid", tagUid);

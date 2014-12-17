@@ -11,6 +11,10 @@ import org.apache.log4j.Logger;
 
 import com.zephyr.sql.DBConnection;
 
+/**
+ * @author whlzcy
+ * Êý¾Ý¿âµ×²ã²Ù×÷
+ */
 public class DBOperator {
 	
 	private DBOperator() {};

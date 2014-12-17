@@ -17,7 +17,7 @@
 		<servlet-class>com.position.message.sender.PositionMessageSender</servlet-class>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
-	 
+
 
 	<servlet>
 		<servlet-name>taginfor</servlet-name>
@@ -27,6 +27,26 @@
 	<servlet-mapping>
 		<servlet-name>taginfor</servlet-name>
 		<url-pattern>/taginfor</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>consumeinfor</servlet-name>
+		<servlet-class>com.position.servlet.TagsConsumeServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>consumeinfor</servlet-name>
+		<url-pattern>/consumeinfor</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>readerinfor</servlet-name>
+		<servlet-class>com.position.servlet.ReaderInfoServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>readerinfor</servlet-name>
+		<url-pattern>/readerinfor</url-pattern>
 	</servlet-mapping>
 	
 	

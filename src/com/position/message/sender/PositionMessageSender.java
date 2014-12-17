@@ -80,7 +80,18 @@ public class PositionMessageSender extends HttpServlet {
 			}
 
 			SenderTask task = new SenderTask();
-			timer.schedule(task, 30, 30);
+			
+			Object sendIntervalValue = RelationData.getInstance().getParas("sendInterval") ;
+			
+			Integer sendInterval = 30 ;
+			
+			if ( sendIntervalValue != null)
+			{
+				sendInterval = Integer.parseInt( sendIntervalValue.toString() ) ;
+			}
+			
+			timer.schedule(task, sendInterval, sendInterval);
+			
 			future.awaitUninterruptibly();
 			// wait until the summation is done
 			// session.getCloseFuture().awaitUninterruptibly();
