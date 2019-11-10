@@ -19,7 +19,7 @@ public class IOControler extends IoFilterAdapter {
 	public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
 		
 		InetSocketAddress inetSocketAddress = (InetSocketAddress) session.getRemoteAddress();
-		log.info("ÊÕµ½ÐÂµÄÁ¬½ÓÇëÇó£¬IP£º" + inetSocketAddress.getAddress().getHostAddress() + " ¶Ë¿Ú:" + inetSocketAddress.getPort());
+		log.info("ï¿½Õµï¿½ï¿½Âµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IPï¿½ï¿½" + inetSocketAddress.getAddress().getHostAddress() + " ï¿½Ë¿ï¿½:" + inetSocketAddress.getPort());
 
 		IoBuffer ioBuffer = IoBuffer.allocate(37);
 		ioBuffer.setAutoExpand(true);
@@ -27,7 +27,7 @@ public class IOControler extends IoFilterAdapter {
 		session.setAttribute("messageBuffer" , ioBuffer) ;
 		
 		DBManager.newInstance().sotreTcpConnectionChanges(session, 0);
-		
+		log.info(session);
 		nextFilter.sessionOpened(session);
 
 	}
@@ -56,7 +56,8 @@ public class IOControler extends IoFilterAdapter {
 	
 	public void exceptionCaught(IoFilter.NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {
 	//	session.close(false) ;
-		cause.printStackTrace(); 
+		cause.printStackTrace();
+		log.error("please restart");
 		nextFilter.exceptionCaught(session, cause);
 	}
 

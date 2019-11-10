@@ -1,5 +1,2 @@
-positionSrv
-
-V1.1
-jdk版本变更
+通用rfid接收器
 ===========
