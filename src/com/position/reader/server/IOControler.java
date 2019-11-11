@@ -41,7 +41,7 @@ public class IOControler extends IoFilterAdapter {
 	
 	public void sessionIdle(IoFilter.NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
 		
-		session.close(false) ;
+		session.close(true) ;
 		
 		nextFilter.sessionIdle(session, status);
 	}
