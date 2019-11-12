@@ -3,8 +3,7 @@
 	<td>${item.physicalid!""} </td>
 	<td>${item.cardid!""} </td>
 	<td>${item.glassesid!""} </td>
-	<td><#if (item.batteryValue ==0)>µçÁ¿³ä×ã<#else>µçÁ¿²»×ã</#if> </td>
+	<td><#if (item.batteryValue ==0)>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½<#else>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</#if> </td>
 	<td>${item.positionx!""} </td><td>${item.positiony!""}</td><td>${item.positionz!""} </td>
-	<td>${item.updatetime?string("yyyy-MM-dd HH:mm:ss")!""} </td>
 	</tr>
 </#list>
